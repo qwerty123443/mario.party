@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<title>Graph</title>
+
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script type="text/javascript">
+		google.charts.load('current', {'packages':['corechart']});
+
+		function load() {
+			fetch('/scores.php').then(response => {
+				response.json().then(json => {
+					if (json.success) {
+						document.body.innerHTML = '';
+
+						const highscoresObj = highScoresChart(json.scoresCSV);
+						const mostplayedObj = mostPlayedChart(json.scoresCSV);
+
+						totalScoresChart(highscoresObj, mostplayedObj);
+					} else document.write('An error occurred: No valid JSON data.');
+				}).catch(err => {
+					console.error('An error occurred', err);
+					document.write('An error occurred: ' + err);
+				});
+			}).catch(err => {
+				console.error('An error occurred', err);
+				document.write('An error occurred: ' + err);
+			});
+		}
+
+		function highScoresChart(scores) {
+			const data = new google.visualization.DataTable();
+			const options = {
+				'title': 'Highscores',
+				'width': 800,
+				'height': 600
+			};
+
+			const nameScoresObj = {};
+			const formattedArray = [];
+			const elem = document.createElement('div');
+			const chart = new google.visualization.PieChart(elem);
+
+			data.addColumn('string', 'Name');
+			data.addColumn('number', 'Score');
+
+			scores.split('\n').forEach((object, key) => {
+				const splitArr = object.split(',');
+				if (splitArr[0] in nameScoresObj)
+					nameScoresObj[splitArr[0]] += Number(splitArr[1]);
+				else
+					nameScoresObj[splitArr[0]] = Number(splitArr[1]);
+			});
+			for (val in nameScoresObj)
+				formattedArray.push([val, nameScoresObj[val]]);
+
+			formattedArray.sort((a, b) => {
+				return b[1] - a[1];
+			});
+
+			data.addRows(formattedArray);
+			chart.draw(data, options);
+			document.body.appendChild(elem);
+
+			return nameScoresObj;
+		}
+
+		function mostPlayedChart(scores) {
+			const data = new google.visualization.DataTable();
+			const options = {
+				'title': 'Most played',
+				'width': 800,
+				'height': 600
+			};
+
+			const mostPlayedObj = {};
+			const mostPlayedArr = [];
+			const elem = document.createElement('div');
+			const chart = new google.visualization.PieChart(elem);
+
+			data.addColumn('string', 'Name');
+			data.addColumn('number', 'Times played');
+
+			scores.split('\n').forEach((object, key) => {
+				const splitArr = object.split(',');
+
+				if (splitArr[0] in mostPlayedObj)
+					mostPlayedObj[splitArr[0]]++;
+				else
+					mostPlayedObj[splitArr[0]] = 1;
+			});
+
+			for (key in mostPlayedObj)
+				mostPlayedArr.push([key, mostPlayedObj[key]]);
+
+			mostPlayedArr.sort((a, b) => {
+				return b[1] - a[1];
+			});
+
+			data.addRows(mostPlayedArr);
+			chart.draw(data, options);
+			document.body.appendChild(elem);
+
+			return mostPlayedObj;
+		}
+
+		function totalScoresChart(scores, playedAmount) {
+			const data = new google.visualization.DataTable();
+			const options = {
+				'title': 'Total score',
+				'width': 800,
+				'height': 600
+			};
+
+			const totalscoreArr = [];
+			const elem = document.createElement('div');
+			const chart = new google.visualization.PieChart(elem);
+
+			data.addColumn('string', 'Name');
+			data.addColumn('number', 'Total score');
+
+			for (key in scores)
+				totalscoreArr.push([key, scores[key] / playedAmount[key]]);
+
+			totalscoreArr.sort((a,b) => {
+				return b[1] - a[1];
+			});
+
+			data.addRows(totalscoreArr);
+			chart.draw(data, options);
+			document.body.appendChild(elem);
+		}
+
+		window.onload = load;
+	</script>
+
+</head>
+<body>
+
+	<h1>Graphs loading...</h1>
+
+</body>
