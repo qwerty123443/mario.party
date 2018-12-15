@@ -22,7 +22,6 @@
     SOFTWARE.
  */
  
-let int;
 let canvas;
 let mouseX = 0;
 let mouseY = 0;
@@ -59,7 +58,6 @@ function loop() {
 
 function noLoop() {
 	looping = false;
-// 	clearInterval(int);
 }
 
 function preventLoop() {

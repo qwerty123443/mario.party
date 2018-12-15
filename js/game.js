@@ -15,7 +15,7 @@ const obstacles = [];
 const colors = ["#1abc9c", "#2ecc71", "#3498db", "#9b59b6", "#16a085", "#27ae60", "#2980b9", "#8e44ad", "#f1c40f", "#e67e22", "#e74c3c", "#f39c12", "#d35400", "#c0392b"];
 
 function setup() {
-    canvas = new Canvas(document.getElementById('canvas'), 300, 500); // split this canvas in multiple layers? requires modifications to the library as well
+    canvas = new Canvas(document.getElementById('canvas'), 300, 500);
     player = new Player(canvas);
     combo = new Combo();
 
@@ -71,10 +71,13 @@ function draw() {
     }
     canvas.background('#CCCCCC');
     canvas.connect(trail, 4, '#2196f3');
-    trail.forEach((object, key) => {
-        if (object.y > canvas.height) trail.splice(key, 1);
-        object.y += speed;
-    });
+    for(let i = 0; i<trail.length;i++){
+        trail[i].y += speed;
+        if (trail[i].y > canvas.height) {
+            trail.splice(i--, 1);
+            continue;
+        }
+    }
 
     player.update();
     player.draw();
@@ -98,11 +101,8 @@ function draw() {
         }
         // Check off-screen
         if ((obstacles[i].pos.y - obstacles[i].size) > canvas.height) {
-            console.log(obstacles);
-            console.log(obstacles.splice(i, 1));
-            console.log(obstacles);
-            //console.log(obstacles[i])
-            console.log(i)
+            obstacles.splice(i--, 1);
+            continue;
         }
 
         const rect = {
@@ -116,7 +116,7 @@ function draw() {
         if (Math.rectCircleColliding(circle, rect)) gameOver();
 
         // Check if past a certain point and spawn a new obstacle
-        if (obstacles[i].pos.y >= Math.randomBetween(-10, 10) + ((canvas.height / 3)) && obstacles[i].hasSpawned === false) {
+        if (!gameover && rect.y >= Math.randomBetween(-10, 10) + ((canvas.height / 3)) && obstacles[i].hasSpawned === false) {
             obstacles[i].hasSpawned = true;
             obstacles.push(new Obstacle(canvas, Math.randomBetween(30, 60), center.x + Math.randomBetween(-canvas.width / 3, canvas.width / 3)));
         }
@@ -232,13 +232,13 @@ class Obstacle {
     }
 
     move() {
-        this.pos.y += speed;
         speed = Math.min(speed + acceleration, maxSpeed);
+        this.pos.y += speed;
     }
 
     stop() {
-        this.pos.y += speed;
         speed = Math.max(speed - maxSpeed / 120, 0);
+        this.pos.y += speed;
     }
 
     draw() {
