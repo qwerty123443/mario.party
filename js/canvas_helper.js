@@ -65,17 +65,6 @@ function preventLoop() {
 	shouldLoop = false;
 }
 
-function resize() {
-	let newH = 200;
-	let newW = 'auto';
-
-	if (canvas.origionalWidthAndHeight.h == 'auto') {
-		newH = 'auto';
-	}
-
-	canvas.resize(newW, newH);
-}
-
 function mouse(evt) {
 	mouseX = evt.x;
 	mouseY = evt.y;
