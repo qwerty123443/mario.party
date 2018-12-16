@@ -70,7 +70,7 @@ function draw() {
         framesdown++;
         moveTime = 10;
     } else {
-        framesdown = framesdown > 0 ? framesdown-5 : 0;
+        framesdown = framesdown - 5 >= 0 ? framesdown - 5 : 0;
         framesup++;
     }
     canvas.connect(trail, 4, "#2196f3");
@@ -153,7 +153,7 @@ function gameOver() {
     const name = nameElem.value.trim();
     if (name !== "") {
         if (navigator.onLine) {
-            updateInterface("?name="+name+"&score="+score);
+            updateInterface("?name=" + name + "&score=" + score);
         }
     } else {
         showUsernameMessage(nameElem);
@@ -185,7 +185,7 @@ class Combo {
             this.comboCount++;
             this.ticks = 0;
             this.scored = false;
-            this.dispText = "Combo "+this.comboCount+"!";
+            this.dispText = "Combo " + this.comboCount + "!";
         }
         if (this.dispText !== "") {
             this.ticks++;
@@ -266,9 +266,9 @@ function updateInterface(params) {
             if (xhr.status == 200) {
                 let scoreboard = xhr.response.scoresCSV.split("\n");
                 let result = "<tr><th><b>name</b></th><th><b>score</b></th></tr>";
-                for (let i = 0; i < Math.min(scoreboard.length-1,5); i++) {
+                for (let i = 0; i < Math.min(scoreboard.length - 1,5); i++) {
                     let split = scoreboard[i].split(",");
-                    result+="<tr><td>"+split[0]+"</th><td>"+split[1]+"</td></tr>";
+                    result += "<tr><td>" + split[0]+"</th><td>" + split[1]+"</td></tr>";
                 }
                 document.getElementById("highscores").innerHTML = result;
             }
