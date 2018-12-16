@@ -1,3 +1,5 @@
+const DEBUG = true;
+
 let player;
 let score = 0;
 let moveTime = 10;
@@ -25,7 +27,7 @@ function setup() {
     window.addEventListener('keydown', evt => {
         if (document.activeElement != nameElem && nameElem.value !== '') {
             moving = true;
-            if (gameover){
+            if (gameover) {
                 gameover = false;
                 obstacles.push(new Obstacle(canvas, Math.randomBetween(30, 60), center.x + Math.randomBetween(-canvas.width / 3, canvas.width / 3)));
                 loop();
@@ -41,7 +43,7 @@ function setup() {
     window.addEventListener('touchstart', evt => {
         if (document.activeElement != nameElem && nameElem.value !== '') {
             moving = true;
-            if (gameover){
+            if (gameover) {
                 gameover = false;
                 obstacles.push(new Obstacle(canvas, Math.randomBetween(30, 60), center.x + Math.randomBetween(-canvas.width / 3, canvas.width / 3)));
                 loop();
@@ -61,17 +63,18 @@ function setup() {
 }
 
 function draw() {
-    if (moving){
+    canvas.background('#CCCCCC');
+    DEBUG? debugDraw() : ()=>{};
+    if (moving) {
         framesup = 0;
         framesdown++;
         moveTime = 10;
     } else {
-        framesdown = 0;
+        framesdown = framesdown > 0 ? framesdown-5 : 0;
         framesup++;
     }
-    canvas.background('#CCCCCC');
     canvas.connect(trail, 4, '#2196f3');
-    for(let i = 0; i<trail.length;i++){
+    for(let i = 0; i<trail.length;i++) {
         trail[i].y += speed;
         if (trail[i].y > canvas.height) {
             trail.splice(i--, 1);
@@ -91,7 +94,7 @@ function draw() {
         r: player.size
     };
 
-    for(let i = 0; i<obstacles.length;i++){
+    for(let i = 0; i<obstacles.length;i++) {
         obstacles[i].draw();
         if (moving) {
             obstacles[i].move();
@@ -132,7 +135,7 @@ function draw() {
 }
 
 function showUsernameMessage(nameElem) {
-    if(nameElem.value.trim() !== ''){
+    if(nameElem.value.trim() !== '') {
         nameElem.style.border = '';
         canvas.canvas.focus();
     } else {
@@ -160,43 +163,47 @@ function gameOver() {
     obstacles.length = 0;
     score = 0;
     time = 0;
-    combo.combo = 0;
+    combo.gameOver();
     framesup = 0;
     framesdown = 0;
 }
 
 class Combo {
     constructor() {
-        this.onscreen = false;
         this.scored = false;
+        this.dispText = "";
         this.ticks = 0;
         this.comboCount = 0;
     }
 
     update() {
-        if (framesup >= 30 && this.comboCount > 0) {
+        if (framesup >= 60 && this.comboCount > 0) {
             this.comboCount = 0;
-            this.ticks = 0;
-        }
-        if ((framesdown + 1)% 200 === 0 && score!==0 ) {
-            this.comboCount += 1;
+            this.ticks = this.ticks > 60 ? 60 : this.ticks;
+            this.dispText = "Lost combo :("
+        } else if ((framesdown + 1)% 200 === 0 && score!==0 ) {
+            this.comboCount++;
             this.ticks = 0;
             this.scored = false;
-            this.onscreen = true;
+            this.dispText = "Combo "+this.comboCount+"!";
         }
-        if (this.onscreen){
-            this.ticks += 1;
-            if (this.comboCount > 0) {
-                canvas.text("combo "+this.comboCount+"!", center.x, center.y, 'blue', 20);
-            }
+        if (this.dispText !== "") {
+            this.ticks++;
+            canvas.text(this.dispText, center.x, center.y, 'blue', 20);
             if (this.ticks > 120) {
-                this.onscreen = false;
+                this.dispText = "";
             }
             if (!this.scored) {
                 this.scored = true;
                 score += this.comboCount * 10;
             }
         }
+    }
+    gameOver() {
+        this.scored = false;
+        this.dispText = "";
+        this.ticks = 0;
+        this.comboCount = 0;
     }
 }
 
@@ -245,13 +252,17 @@ class Obstacle {
         this.canvas.square(this.pos.x, this.pos.y, this.size, this.color, false);
     }
 }
-
+function debugDraw() {
+    canvas.text(framesup,   10, 45, 'blue', 20, 'left');
+    canvas.text(framesdown, 10, 65, 'blue', 20, 'left');
+    canvas.text(combo.comboCount, 10, 85, 'blue', 20, 'left');
+}
 function updateInterface(params) {
     let xhr = new XMLHttpRequest();
     xhr.open('get', 'scores.php'+(params||""), true);
     xhr.responseType = 'json';
     if (!params) {
-        xhr.onload = function() {
+        xhr.onload = () => {
             if (xhr.status == 200) {
                 let scoreboard = xhr.response.scoresCSV.split('\n');
                 let result = "<tr><th><b>name</b></th><th><b>score</b></th></tr>";
@@ -265,7 +276,7 @@ function updateInterface(params) {
         };
     }
     else {
-        xhr.onload = function(){
+        xhr.onload = () => {
             updateInterface();
         };
     }
