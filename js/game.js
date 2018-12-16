@@ -17,15 +17,15 @@ const obstacles = [];
 const colors = ["#1abc9c", "#2ecc71", "#3498db", "#9b59b6", "#16a085", "#27ae60", "#2980b9", "#8e44ad", "#f1c40f", "#e67e22", "#e74c3c", "#f39c12", "#d35400", "#c0392b"];
 
 function setup() {
-    canvas = new Canvas(document.getElementById('canvas'), 300, 500);
+    canvas = new Canvas(document.getElementById("canvas"), 300, 500);
     player = new Player(canvas);
     combo = new Combo();
 
-    const nameElem = document.getElementById('name');
+    const nameElem = document.getElementById("name");
 
     // Keyboard
-    window.addEventListener('keydown', evt => {
-        if (document.activeElement != nameElem && nameElem.value !== '') {
+    window.addEventListener("keydown", evt => {
+        if (document.activeElement != nameElem && nameElem.value !== "") {
             moving = true;
             if (gameover) {
                 gameover = false;
@@ -35,13 +35,13 @@ function setup() {
         }
     });
 
-    window.addEventListener('keyup', evt => {
+    window.addEventListener("keyup", evt => {
        moving = false;
     });
 
     // Touch
-    window.addEventListener('touchstart', evt => {
-        if (document.activeElement != nameElem && nameElem.value !== '') {
+    window.addEventListener("touchstart", evt => {
+        if (document.activeElement != nameElem && nameElem.value !== "") {
             moving = true;
             if (gameover) {
                 gameover = false;
@@ -51,7 +51,7 @@ function setup() {
         }
     });
 
-    window.addEventListener('touchend', evt => {
+    window.addEventListener("touchend", evt => {
         moving = false;
     });
 
@@ -63,7 +63,7 @@ function setup() {
 }
 
 function draw() {
-    canvas.background('#CCCCCC');
+    canvas.background("#CCCCCC");
     DEBUG? debugDraw() : ()=>{};
     if (moving) {
         framesup = 0;
@@ -73,7 +73,7 @@ function draw() {
         framesdown = framesdown > 0 ? framesdown-5 : 0;
         framesup++;
     }
-    canvas.connect(trail, 4, '#2196f3');
+    canvas.connect(trail, 4, "#2196f3");
     for(let i = 0; i<trail.length;i++) {
         trail[i].y += speed;
         if (trail[i].y > canvas.height) {
@@ -129,31 +129,31 @@ function draw() {
 
     if (moveTime <= 0) gameOver();
 
-    canvas.background('rgba(255, 255, 255, 0.5)');
-    canvas.text(Math.round(moveTime), 10, 25, (moveTime <= 5) ? 'red' : 'white', 20, 'left');
-    canvas.text(Math.round(score), canvas.width - 10, 25, 'white', 20, 'right');
+    canvas.background("rgba(255, 255, 255, 0.5)");
+    canvas.text(Math.round(moveTime), 10, 25, (moveTime <= 5) ? "red" : "white", 20, "left");
+    canvas.text(Math.round(score), canvas.width - 10, 25, "white", 20, "right");
 }
 
 function showUsernameMessage(nameElem) {
-    if(nameElem.value.trim() !== '') {
-        nameElem.style.border = '';
+    if(nameElem.value.trim() !== "") {
+        nameElem.style.border = "";
         canvas.canvas.focus();
     } else {
-        alert('Add your name!\nIf you don\'t your score won\'t be saved!');
+        alert("Add your name!\nIf you don't your score won't be saved!");
         nameElem.focus();
-        nameElem.style.border = 'red solid 2px';
+        nameElem.style.border = "red solid 2px";
     }
 }
 
 function gameOver() {
     noLoop();
-    canvas.text('YOU LOST', center.x, center.y, 'red', 50);
-    canvas.text('SCORE: ' + Math.round(score), center.x, center.y + 50, 'white', 30);
-    const nameElem = document.getElementById('name');
+    canvas.text("YOU LOST", center.x, center.y, "red", 50);
+    canvas.text("SCORE: " + Math.round(score), center.x, center.y + 50, "white", 30);
+    const nameElem = document.getElementById("name");
     const name = nameElem.value.trim();
-    if (name !== '') {
+    if (name !== "") {
         if (navigator.onLine) {
-            updateInterface('?name='+name+'&score='+score);
+            updateInterface("?name="+name+"&score="+score);
         }
     } else {
         showUsernameMessage(nameElem);
@@ -189,7 +189,7 @@ class Combo {
         }
         if (this.dispText !== "") {
             this.ticks++;
-            canvas.text(this.dispText, center.x, center.y, 'blue', 20);
+            canvas.text(this.dispText, center.x, center.y, "blue", 20);
             if (this.ticks > 120) {
                 this.dispText = "";
             }
@@ -225,7 +225,7 @@ class Player {
     }
 
     draw() {
-        this.canvas.circle(this.pos.x, this.pos.y, this.size, '#2196f3', true);
+        this.canvas.circle(this.pos.x, this.pos.y, this.size, "#2196f3", true);
     }
 }
 
@@ -253,24 +253,23 @@ class Obstacle {
     }
 }
 function debugDraw() {
-    canvas.text(framesup,   10, 45, 'blue', 20, 'left');
-    canvas.text(framesdown, 10, 65, 'blue', 20, 'left');
-    canvas.text(combo.comboCount, 10, 85, 'blue', 20, 'left');
+    canvas.text(framesup,   10, 45, "blue", 20, "left");
+    canvas.text(framesdown, 10, 65, "blue", 20, "left");
+    canvas.text(combo.comboCount, 10, 85, "blue", 20, "left");
 }
 function updateInterface(params) {
     let xhr = new XMLHttpRequest();
-    xhr.open('get', 'scores.php'+(params||""), true);
-    xhr.responseType = 'json';
+    xhr.open("get", "scores.php"+(params||""), true);
+    xhr.responseType = "json";
     if (!params) {
         xhr.onload = () => {
             if (xhr.status == 200) {
-                let scoreboard = xhr.response.scoresCSV.split('\n');
+                let scoreboard = xhr.response.scoresCSV.split("\n");
                 let result = "<tr><th><b>name</b></th><th><b>score</b></th></tr>";
                 for (let i = 0; i < Math.min(scoreboard.length-1,5); i++) {
                     let split = scoreboard[i].split(",");
                     result+="<tr><td>"+split[0]+"</th><td>"+split[1]+"</td></tr>";
                 }
-
                 document.getElementById("highscores").innerHTML = result;
             }
         };
