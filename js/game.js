@@ -153,7 +153,7 @@ function gameOver() {
     const name = nameElem.value.trim();
     if (name !== "") {
         if (navigator.onLine) {
-            updateInterface("?name=" + name + "&score=" + score);
+            updateInterface("?name=" + name + "&score=" + Math.round(score));
         }
     } else {
         showUsernameMessage(nameElem);
