@@ -1,4 +1,5 @@
 const DEBUG = true;
+const INVINCIBLE = false;
 
 let player;
 let score = 0;
@@ -22,6 +23,8 @@ function setup() {
     combo = new Combo();
 
     const nameElem = document.getElementById("name");
+    if (DEBUG)
+        nameElem.value = "DEBUG"
 
     // Keyboard
     window.addEventListener("keydown", evt => {
@@ -127,7 +130,7 @@ function draw() {
     }
     combo.update();
 
-    if (moveTime <= 0) gameOver();
+    if (moveTime <= 0 && !DEBUG) gameOver();
 
     canvas.background("rgba(255, 255, 255, 0.5)");
     canvas.text(Math.round(moveTime), 10, 25, (moveTime <= 5) ? "red" : "white", 20, "left");
@@ -256,6 +259,8 @@ function debugDraw() {
     canvas.text(framesup,   10, 45, "blue", 20, "left");
     canvas.text(framesdown, 10, 65, "blue", 20, "left");
     canvas.text(combo.comboCount, 10, 85, "blue", 20, "left");
+    canvas.text(speed, 10, 105, "blue", 20, "left");
+    canvas.text(frameCount, 10, 125, "blue", 20, "left");
 }
 function updateInterface(params) {
     let xhr = new XMLHttpRequest();
